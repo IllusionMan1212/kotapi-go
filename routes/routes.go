@@ -39,8 +39,8 @@ func RandomHandler(w http.ResponseWriter, req *http.Request) {
 	min := 1
 	// seed the default source using the current time in unix nanosecond format
 	rand.Seed(time.Now().UnixNano())
-	// generate random number between min and `max`
-	num := rand.Intn(int(max)-min) + min
+	// generate random number between min and max [min, max]
+	num := rand.Intn(int(max+1)-min) + min
 
 	// find the random kot document and store it in the `kot` variable
 	err = db.Kots.FindOne(db.Ctx, bson.M{"id": num}).Decode(&kot)
