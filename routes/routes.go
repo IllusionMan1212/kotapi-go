@@ -7,6 +7,7 @@ import (
 	"illusionman1212/kotapi-go/models"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -34,10 +35,12 @@ func RandomHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// ids start from 1
+	min := 1
 	// seed the default source using the current time in unix nanosecond format
 	rand.Seed(time.Now().UnixNano())
-	// generate random number between 0 and `max`
-	num := rand.Intn(int(max + 1))
+	// generate random number between min and `max`
+	num := rand.Intn(int(max)-min) + min
 
 	// find the random kot document and store it in the `kot` variable
 	err = db.Kots.FindOne(db.Ctx, bson.M{"id": num}).Decode(&kot)
@@ -110,6 +113,7 @@ func AddKotHandler(w http.ResponseWriter, req *http.Request) {
 
 	file, handler, err := req.FormFile("image")
 	if err != nil {
+		log.Print("no image was uploaded")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{ "error": "Invalid or incomplete request","status": 400, "failed": true }`))
 		return
@@ -117,11 +121,13 @@ func AddKotHandler(w http.ResponseWriter, req *http.Request) {
 
 	password := req.Form.Get("password")
 	if password == "" {
+		log.Print("no password was sent")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{ "error": "Invalid or incomplete request","status": 400, "failed": true }`))
 		return
 	}
 	if password != os.Getenv("PASSWORD") {
+		log.Print("password is incorrect")
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(`{ "error": "Not authorized","status": 401, "failed": true }`))
 		return

@@ -18,13 +18,13 @@ func main() {
 	}
 	db.InitializeDB()
 
-	router := mux.NewRouter()
-	router.HandleFunc("/", routes.RandomHandler).Methods("GET")
-	router.HandleFunc("/addkot", routes.AddKotHandler).Methods("POST")
-	router.HandleFunc("/{id}", routes.IdHandler).Methods("GET")
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/kotapi", routes.RandomHandler).Methods("GET")
+	router.HandleFunc("/kotapi/addkot", routes.AddKotHandler).Methods("POST")
+	router.HandleFunc("/kotapi/{id}", routes.IdHandler).Methods("GET")
 
-	router.HandleFunc("/kots/compressed/{filename}", routes.KotsCompressedHandler).Methods("GET")
-	router.HandleFunc("/kots/{filename}", routes.KotsHandler).Methods("GET")
+	router.HandleFunc("/kotapi/kots/compressed/{filename}", routes.KotsCompressedHandler).Methods("GET")
+	router.HandleFunc("/kotapi/kots/{filename}", routes.KotsHandler).Methods("GET")
 
 	fmt.Println("Listening on 8080")
 	http.ListenAndServe(":8080", router)
